@@ -1,0 +1,150 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Clairvoyance.MainWindow"
+        xmlns:local="clr-namespace:My_class"
+        xmlns:pages="clr-namespace:My_Page"
+        Title="Tool control center（TCC）"
+        Width="1200"
+        Height="800"
+        WindowStartupLocation="Manual"
+        SystemDecorations="None"
+        RenderOptions.BitmapInterpolationMode="HighQuality">
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<!-- 上方可拖曳區塊 -->
+		<Border Grid.Row="0" Background="Transparent" PointerPressed="Grid__PointerPressed">
+			<Grid>
+				<Image Source="avares://Clairvoyance/My_Photos/金屬外框.jpg"
+                       Stretch="Fill"
+                       IsHitTestVisible="False" />
+
+				<!-- 標題 -->
+				<TextBlock Text="Tool control center（TCC）"
+                           Foreground="White"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           Margin="10,0,0,0" />
+
+				<Button Width="70"
+						Height="30"
+						BorderBrush="{x:Null}"
+						Margin="230,0,0,0"
+						HorizontalAlignment="Left"
+						VerticalAlignment="Center"
+						Click="Bu_PostProcess_Click"
+						Cursor="Hand">
+
+					<Button.Background>
+						<ImageBrush Source="avares://Clairvoyance/My_Photos/tmsc_金屬背景.jpg"
+									Stretch="UniformToFill"/>
+					</Button.Background>
+
+					<!-- 用 TextBlock 來設定文字樣式 -->
+					<TextBlock Text="後處理"
+							   Foreground="White"
+							   FontWeight="Bold"
+							   HorizontalAlignment="Center"
+							   VerticalAlignment="Center"
+							   TextAlignment="Center"/>
+				</Button>
+					
+				<!-- 全螢幕按鈕 -->
+				<Button Width="50"
+						Height="30"
+						BorderBrush="{x:Null}"
+						Margin="0,0,70,0"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Center"
+						Click="Bu_full_screen_Click"
+						Cursor="Hand">
+
+					<Button.Background>
+						<ImageBrush Source="avares://Clairvoyance/My_Photos/紅色金屬.jpg" Stretch="UniformToFill"/>
+					</Button.Background>
+
+					<TextBlock 
+								x:Name="TB_fullscreen"
+								Text="🗗"
+							   HorizontalAlignment="Center"
+							   VerticalAlignment="Center"
+							   Foreground="White"
+							   FontSize="16"/>
+				</Button>
+
+				<!-- 關閉按鈕 -->
+				<Button Width="60"
+						Height="30"
+						
+						BorderBrush="{x:Null}"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Center"
+						Click="Bu_close_Click"
+						Cursor="Hand">
+
+					<Button.Background>
+						<ImageBrush Source="avares://Clairvoyance/My_Photos/紅色金屬.jpg" Stretch="UniformToFill"/>
+					</Button.Background>
+
+					<TextBlock Text="✕"
+							   HorizontalAlignment="Center"
+							   VerticalAlignment="Center"
+							   Foreground="White"
+						
+							   FontSize="16"/>
+				</Button>
+			</Grid>
+		</Border>
+
+		<Grid Grid.Row ="1">
+			<Image Source="avares://Clairvoyance/My_Photos/金屬外框.jpg"
+	   Stretch="Fill"
+	   IsHitTestVisible="False" />
+		</Grid>
+		
+		<Grid Grid.Row ="1">
+			<Image Source="avares://Clairvoyance/My_Photos/金屬外框.jpg"
+	   Stretch="Fill"
+	   IsHitTestVisible="False" />
+			
+			<Grid.RowDefinitions>
+				
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="30"/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="10"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="10"/>
+			</Grid.ColumnDefinitions>
+			<!-- 下方主畫面 -->
+			
+			<pages:page_Draw Grid.Row="0" Grid.Column="1"/>
+
+			<Border x:Name="Bd_ResizeLeft"
+					Grid.Row="0" Grid.Column="0"
+					Width="10"
+					Background="Transparent"/>
+
+			<Border x:Name="Bd_ResizeRight"
+					Grid.Row="0" Grid.Column="2"
+					Width="10"
+					Background="Transparent"/>
+
+			<Border x:Name="Bd_ResizeBottom"
+					Grid.Row="1" Grid.Column="1"
+					Height="10"
+					Background="Transparent"/>
+			
+		</Grid>
+
+		
+	</Grid>
+</Window>

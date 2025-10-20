@@ -1,0 +1,310 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals"
+        xmlns:controls="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls">
+
+	<!-- 預覽（開發用，可刪） -->
+	<Design.PreviewWith>
+		<Border Padding="20" Background="#1a1a1a">
+			<StackPanel Spacing="10">
+				<Button Classes="Sy_按鈕_一般" Content="預覽按鈕" />
+				<Button Classes="Sy_按鈕_連線" Content="連線按鈕" />
+				<Label Classes="Sy_LA_白字" Content="預覽標籤" />
+				<Label Classes="Sy_LA_黑字" Content="預覽標籤" />
+				<Label Classes="Sy_LA_通道標題" Content="通道標題" />
+				<TextBox Classes="Sy_TB_黑字" Text="預覽輸入框" />
+				<AutoCompleteBox Classes="Sy_ACB_黑字"/>
+				<ComboBox Classes="Sy_CB_黑字"/>
+				<ListBox Classes ="Sy_LB_黑字" TextInput=""/>
+				<Border Classes="Sy_Border_通道卡片">
+					<TextBlock Text="CH1" HorizontalAlignment="Center" />
+				</Border>
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- 基礎色彩資源 -->
+	<Styles.Resources>
+		<SolidColorBrush x:Key="PrimaryBlue">#0078D4</SolidColorBrush>
+		<SolidColorBrush x:Key="PrimaryBlueHover">#106EBE</SolidColorBrush>
+		<SolidColorBrush x:Key="AccentGreen">#00CC6A</SolidColorBrush>
+		<SolidColorBrush x:Key="DarkBackground">#1a1a1a</SolidColorBrush>
+		<SolidColorBrush x:Key="CardBackground">#2d2d30</SolidColorBrush>
+		<SolidColorBrush x:Key="BorderColor">#3e3e42</SolidColorBrush>
+		<SolidColorBrush x:Key="TextPrimary">#ffffff</SolidColorBrush>
+		<SolidColorBrush x:Key="TextSecondary">#cccccc</SolidColorBrush>
+	</Styles.Resources>
+
+	<!-- 自訂按鈕樣式 - 一般按鈕 -->
+	<Style Selector="Button.Sy_按鈕_一般">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+		<Setter Property="Background" Value="{StaticResource CardBackground}"/>
+		<Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="Padding" Value="16,8"/>
+		<Setter Property="MinHeight" Value="36"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+
+	<!-- 按鈕懸停效果 -->
+	<Style Selector="Button.Sy_按鈕_一般:pointerover">
+		<Setter Property="Background" Value="#3e3e42"/>
+		<Setter Property="BorderBrush" Value="{StaticResource PrimaryBlue}"/>
+	</Style>
+
+	<!-- 按鈕按下效果 -->
+	<Style Selector="Button.Sy_按鈕_一般:pressed">
+		<Setter Property="Background" Value="#2a2a2a"/>
+	</Style>
+
+	<!-- 連線按鈕樣式 -->
+	<Style Selector="Button.Sy_按鈕_連線">
+
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Background" Value="{StaticResource PrimaryBlue}"/>
+		<Setter Property="BorderBrush" Value="{StaticResource PrimaryBlue}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="Padding" Value="20,8"/>
+		<Setter Property="MinHeight" Value="36"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+
+	<!-- 連線按鈕懸停效果 -->
+	<Style Selector="Button.Sy_按鈕_連線:pointerover">
+		<Setter Property="Background" Value="{StaticResource PrimaryBlueHover}"/>
+		<Setter Property="BorderBrush" Value="{StaticResource PrimaryBlueHover}"/>
+	</Style>
+
+	<!-- 連線按鈕按下效果 -->
+	<Style Selector="Button.Sy_按鈕_連線:pressed">
+		<Setter Property="Background" Value="#0d5a9a"/>
+	</Style>
+
+	<!-- 白字標籤 -->
+	<Style Selector="Label.Sy_LA_白字">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+
+	<!-- 黑字標籤 -->
+	<Style Selector="Label.Sy_LA_黑字">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Foreground" Value="#333333"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+
+	<!-- 通道標題樣式 -->
+	<Style Selector="Label.Sy_LA_通道標題">
+		<Setter Property="FontSize" Value="18"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Background" Value="{StaticResource PrimaryBlue}"/>
+		<Setter Property="Padding" Value="12,8"/>
+		<Setter Property="CornerRadius" Value="6"/>
+	</Style>
+
+	<!-- 輸入框樣式 -->
+	<Style Selector="TextBox.Sy_TB_黑字">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Foreground" Value="#333333"/>
+		<Setter Property="Background" Value="White"/>
+		<Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="Padding" Value="12,8"/>
+		<Setter Property="MinHeight" Value="36"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+	</Style>
+
+	<!-- AutoCompleteBox 樣式 -->
+	<Style Selector="AutoCompleteBox.Sy_ACB_黑字">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Foreground" Value="#333333"/>
+		<Setter Property="Background" Value="White"/>
+		<Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="Padding" Value="12,8"/>
+		<Setter Property="MinHeight" Value="36"/>
+		<Setter Property="Margin" Value="3,0"/>
+	</Style>
+	
+	<!-- ComboBox 樣式 -->
+	<Style Selector="ComboBox.Sy_CB_黑字">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Foreground" Value="#333333"/>
+		<Setter Property="Background" Value="White"/>
+		<Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="Padding" Value="12,8"/>
+		<Setter Property="MinHeight" Value="36"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="3,0"/>
+		<!-- ⬅ 左右預留 3 像素 -->
+	</Style>
+
+	<!-- ListBox 樣式 -->
+	<Style Selector="ListBox.Sy_LB_黑字">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Foreground" Value="#333333"/>
+		<Setter Property="Background" Value="White"/>
+		<Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="Padding" Value="12,8"/>
+		<Setter Property="MinHeight" Value="36"/>
+		<Setter Property="Margin" Value="3,0"/>
+	</Style>
+	
+	<!-- 輸入框聚焦效果 -->
+	<Style Selector="TextBox.Sy_TB_黑字:focus">
+		<Setter Property="BorderBrush" Value="{StaticResource PrimaryBlue}"/>
+		<Setter Property="BorderThickness" Value="2"/>
+	</Style>
+
+	<!-- ComboBox 聚焦效果 -->
+	<Style Selector="ComboBox.Sy_CB_黑字:focus">
+		<Setter Property="BorderBrush" Value="{StaticResource PrimaryBlue}"/>
+		<Setter Property="BorderThickness" Value="2"/>
+	</Style>
+
+	<!-- 通道卡片邊框 -->
+	<Style Selector="Border.Sy_Border_通道卡片">
+		<Setter Property="Background" Value="{StaticResource CardBackground}"/>
+		<Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="Padding" Value="16"/>
+	</Style>
+
+	<!-- 主容器樣式 -->
+	<Style Selector="Grid.Sy_Grid_主容器">
+		<Setter Property="Background" Value="{StaticResource DarkBackground}"/>
+	</Style>
+
+	<!-- 頂部區域樣式 -->
+	<Style Selector="Grid.Sy_Grid_頂部">
+		<Setter Property="Background">
+			<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+				<GradientStop Color="#2d2d30" Offset="0"/>
+				<GradientStop Color="#1a1a1a" Offset="1"/>
+			</LinearGradientBrush>
+		</Setter>
+	</Style>
+
+	<!-- 連線狀態指示器 -->
+	<Style Selector="Label.Sy_LA_連線狀態">
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="Padding" Value="12,6"/>
+		<Setter Property="CornerRadius" Value="15"/>
+		<Setter Property="Background" Value="#FF6B6B"/>
+		<Setter Property="Foreground" Value="White"/>
+	</Style>
+
+	<!-- 已連線狀態 -->
+	<Style Selector="Label.Sy_LA_連線狀態[Content='已連線']">
+		<Setter Property="Background" Value="{StaticResource AccentGreen}"/>
+	</Style>
+
+	<!-- 數值顯示標籤 -->
+	<Style Selector="Label.Sy_LA_數值">
+		<Setter Property="FontSize" Value="24"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="FontFamily" Value="Consolas, Monaco, monospace"/>
+		<Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
+
+	<!-- 通道CH1樣式 -->
+	<Style Selector="Label.Sy_LA_CH1">
+		<Setter Property="Background" Value="#000000"/>
+	</Style>
+
+	<!-- 通道CH2樣式 -->
+	<Style Selector="Label.Sy_LA_CH2">
+		<Setter Property="Background" Value="#000000"/>
+	</Style>
+
+	<!-- 通道CH3樣式 -->
+	<Style Selector="Label.Sy_LA_CH3">
+		<Setter Property="Background" Value="#000000"/>
+	</Style>
+
+	<!-- 通道CH4樣式 -->
+	<Style Selector="Label.Sy_LA_CH4">
+		<Setter Property="Background" Value="#000000"/>
+	</Style>
+
+	<!-- 圖表容器樣式 -->
+	<Style Selector="Border.Sy_Border_圖表">
+		<Setter Property="Background" Value="#1e1e1e"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="BorderThickness" Value="2"/>
+	</Style>
+
+	<!-- 圖表容器CH1 -->
+	<Style Selector="Border.Sy_Border_圖表_CH1">
+		<Setter Property="BorderBrush" Value="#8BB4D8"/>
+	</Style>
+
+	<!-- 圖表容器CH2 -->
+	<Style Selector="Border.Sy_Border_圖表_CH2">
+		<Setter Property="BorderBrush" Value="#A8D8B0"/>
+	</Style>
+
+	<!-- 圖表容器CH3 -->
+	<Style Selector="Border.Sy_Border_圖表_CH3">
+		<Setter Property="BorderBrush" Value="#F4D58D"/>
+	</Style>
+
+	<!-- 圖表容器CH4 -->
+	<Style Selector="Border.Sy_Border_圖表_CH4">
+		<Setter Property="BorderBrush" Value="#E8B4CB"/>
+	</Style>
+
+	<!-- 圖表標籤樣式 -->
+	<Style Selector="TextBlock.Sy_TB_圖表標籤">
+		<Setter Property="FontSize" Value="12"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="HorizontalAlignment" Value="Left"/>
+		<Setter Property="VerticalAlignment" Value="Top"/>
+		<Setter Property="Margin" Value="8"/>
+	</Style>
+
+	<!-- 狀態資訊樣式 -->
+	<Style Selector="TextBlock.Sy_TB_狀態資訊">
+		<Setter Property="FontSize" Value="12"/>
+		<Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+	</Style>
+
+	<!-- 狀態數值樣式 -->
+	<Style Selector="TextBlock.Sy_TB_狀態數值">
+		<Setter Property="FontSize" Value="12"/>
+		<Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+	</Style>
+</Styles>

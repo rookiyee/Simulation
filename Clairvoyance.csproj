@@ -1,0 +1,107 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="My_Photos\tmsc_金屬背景.jpg" />
+    <None Remove="My_Photos\tmsc_銀字_白中文.png" />
+    <None Remove="My_Photos\按鈕背景.png" />
+    <None Remove="My_Photos\紅色金屬.jpg" />
+    <None Remove="My_Photos\背景.jpg" />
+    <None Remove="My_Photos\金屬外框.jpg" />
+    <None Remove="My_Photos\金屬背景.jpg" />
+    <None Remove="My_Photos\金屬背景.png" />
+    <None Remove="My_Photos\鐵灰白色.jpg" />
+    <None Remove="User_data\MyApp.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9386" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="3.2.9386" />
+    <PackageReference Include="Avalonia" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Skia" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Skia.Lottie" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.6">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
+    <PackageReference Include="MathNet.Numerics" Version="6.0.0-beta2" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.55.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Configuration" Version="1.5.376.244" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Core" Version="1.5.376.244" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Gds.Client.Common" Version="1.5.376.244" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Gds.Server.Common" Version="1.5.376.244" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Security.Certificates" Version="1.5.376.244" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Server" Version="1.5.376.244" />
+    <PackageReference Include="SkiaSharp" Version="3.119.1-preview.1" />
+    <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="My_Photos\tmsc_金屬背景.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\tmsc_銀字_白中文.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\按鈕背景.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\紅色金屬.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\背景.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\金屬外框.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\金屬背景.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\金屬背景.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="My_Photos\鐵灰白色.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="User_data\MyApp.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="My_class\Skia_chart.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="User_data\10mm_tool.STL">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="User_data\box.stl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="User_data\Gcode.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="User_data\Link_UserSet.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

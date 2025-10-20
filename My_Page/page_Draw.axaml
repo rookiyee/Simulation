@@ -1,0 +1,393 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="My_Page.page_Draw"
+    xmlns:local="clr-namespace:My_class"
+    xmlns:pages="clr-namespace:My_Page"
+    xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals"
+	xmlns:d="https://github.com/avaloniaui"
+    d:Design.Height="1080"
+    d:Design.Width="1920">
+
+	<UserControl.Styles>
+		<StyleInclude Source="avares://Clairvoyance/My_Page/_Style_cite_.axaml"/>
+	</UserControl.Styles>
+
+	<Grid Classes="Sy_Grid_主容器">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<!-- 頂部連線設定與公司商標區域 -->
+		<Grid Grid.Row="0" Classes="Sy_Grid_頂部" Margin="0,0,0,1">
+			<Grid.Background>
+				<ImageBrush Source="avares://Clairvoyance/My_Photos/tmsc_金屬背景.jpg"
+   Stretch="UniformToFill"/>
+			</Grid.Background>
+			<Border CornerRadius="0,0,12,12" Padding="24,16">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					<!-- 連線設定標題 -->
+					
+					<TextBlock Grid.Row="0"
+					          Text="連線設定"
+					          FontSize="20"
+					          FontWeight="Bold"
+					          Foreground="White"
+					          Margin="0,0,0,16"/>
+
+					<!-- 連線設定控件 -->
+					<Grid Grid.Row="1">
+						<Grid.ColumnDefinitions>
+							<!-- 以連線路由器 0 到 1 -->
+							<ColumnDefinition Width="160"/>
+							<ColumnDefinition Width="20"/>
+							<!-- 可連線刀把 2 到 4-->
+							<ColumnDefinition Width="125"/>
+							<ColumnDefinition Width="250"/>
+							<ColumnDefinition Width="25"/>
+							<!-- 按鈕 和 狀態 5 到 7 -->
+							<ColumnDefinition Width="70"/>
+							<ColumnDefinition Width="1"/>
+							<ColumnDefinition Width="65"/>
+							<ColumnDefinition Width="3"/>
+							<!-- 留白 10-->
+							<ColumnDefinition Width="30"/>
+							<!-- 留白 8-->
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<!--顯示所有以連線的路由器-->
+						<ComboBox Grid.Column="0"
+								  x:Name="CB_AllRouterLink"
+								  Classes ="Sy_CB_黑字"
+								  HorizontalAlignment="Stretch"/>
+
+						<Label Grid.Column="2"
+								   FontSize="20"
+								   FontWeight="Bold"
+								   Content="可連線刀把:"
+								   Classes="Sy_LA_白字"
+								   Margin="0,0,12,0"/>
+
+						<!--可用刀把-->
+						<AutoCompleteBox Grid.Column="3"
+								  x:Name="ACB_TTCSelect"
+								  Classes="Sy_ACB_黑字"
+								  HorizontalAlignment="Stretch"/>
+
+						<!-- 按鈕 -->
+						<Button Grid.Column="5" Classes="Sy_按鈕_一般"
+								x:Name="Bu_TTCLink"
+								Content = "連線"
+								Height="30"/>
+
+						<Label Grid.Column="7" Classes="Sy_LA_白字"
+								FontWeight="Bold"
+								Content = "未連線"
+							    HorizontalAlignment="Center"
+							    VerticalAlignment="Center"
+								x:Name = "La_TTCLink"/>
+						<Button Grid.Column="10" Classes="Sy_按鈕_一般"
+							x:Name ="Bu_CNCXYZ"
+							Content = "工具機連線"
+							Height="30"/>
+
+
+					</Grid>
+
+					<!-- 公司商標 -->
+					<Border Grid.Row="0" Grid.RowSpan="2"
+					        HorizontalAlignment="Right"
+					        VerticalAlignment="Top"
+					        Width="230"
+					        Height="90"
+					        Margin="0,-8,0,0">
+						<Border.Background>
+							<ImageBrush Source="avares://Clairvoyance/My_Photos/tmsc_銀字_白中文.png"
+							           Stretch="Uniform"/>
+						</Border.Background>
+					</Border>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<!-- 主內容區域 -->
+		<Grid Grid.Row="1" Margin="16">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="400"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+
+			<!-- 左側花瓣圖區域 -->
+			<Grid Grid.Column="0" Margin="0,0,16,0">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="70"/>
+						<RowDefinition Height="16"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+
+					<Grid Grid.Row="0">
+						<Border Classes="Sy_Border_通道卡片">
+							<Label Classes="Sy_LA_數值"
+								Content="0.000"
+								x:Name ="La_CNCXYZ"
+							/>
+						</Border>
+					</Grid>
+					<Grid Grid.Row ="2">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="16"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+
+						<!-- 花瓣圖1容器 -->
+						<Border Grid.Row="0" Classes="Sy_Border_通道卡片">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+
+								<TextBlock Grid.Row="0"
+										  Text="感測分析 - CH1 vs CH2"
+										  FontSize="14"
+										  FontWeight="SemiBold"
+										  Foreground="#cccccc"
+										  HorizontalAlignment="Center"
+										  Margin="0,0,0,12"/>
+
+								<local:Skia_花瓣圖_1 Grid.Row="1" x:Name="sk_fp1"/>
+							</Grid>
+						</Border>
+
+						<!-- 花瓣圖2容器 -->
+						<Border Grid.Row="2" Classes="Sy_Border_通道卡片">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+
+								<TextBlock Grid.Row="0"
+										  Text="感測分析 - CH3 vs CH4"
+										  FontSize="14"
+										  FontWeight="SemiBold"
+										  Foreground="#cccccc"
+										  HorizontalAlignment="Center"
+										  Margin="0,0,0,12"/>
+
+								<local:Skia_花瓣圖_2 Grid.Row="1" x:Name="sk_fp2"/>
+							</Grid>
+						</Border>
+					</Grid>
+
+				</Grid>
+
+			</Grid>
+
+			<!-- 右側通道顯示區域 -->
+			<Grid Grid.Column="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="70"/>
+					<RowDefinition Height="16"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+
+					<!-- 通道1 -->
+					<Border Grid.Column="0" Classes="Sy_Border_通道卡片">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0"
+								   Content="CH1"
+								   Classes="Sy_LA_通道標題 Sy_LA_CH1"
+								   Margin="0,0,12,0"/>
+							<Label Grid.Column="1"
+								   x:Name="LA_ch1_value"
+								   Content="0.000"
+								   Classes="Sy_LA_數值"/>
+						</Grid>
+					</Border>
+
+					<!-- 通道2 -->
+					<Border Grid.Column="2" Classes="Sy_Border_通道卡片">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0"
+								   Content="CH2"
+								   Classes="Sy_LA_通道標題 Sy_LA_CH2"
+								   Margin="0,0,12,0"/>
+							<Label Grid.Column="1"
+								   x:Name="LA_ch2_value"
+								   Content="0.000"
+								   Classes="Sy_LA_數值"/>
+						</Grid>
+					</Border>
+
+					<!-- 通道3 -->
+					<Border Grid.Column="4" Classes="Sy_Border_通道卡片">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0"
+								   Content="CH3"
+								   Classes="Sy_LA_通道標題 Sy_LA_CH3"
+								   Margin="0,0,12,0"/>
+							<Label Grid.Column="1"
+								   x:Name="LA_ch3_value"
+								   Content="0.000"
+								   Classes="Sy_LA_數值"/>
+						</Grid>
+					</Border>
+
+					<!-- 通道4 -->
+					<Border Grid.Column="6" Classes="Sy_Border_通道卡片">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0"
+								   Content="CH4"
+								   Classes="Sy_LA_通道標題 Sy_LA_CH4"
+								   Margin="0,0,12,0"/>
+							<Label Grid.Column="1"
+								   x:Name="LA_ch4_value"
+								   Content="0.000"
+								   Classes="Sy_LA_數值"/>
+						</Grid>
+					</Border>
+				</Grid>
+
+				<!-- 折線圖顯示區域 -->
+				<Border Grid.Row="2" Classes="Sy_Border_通道卡片">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+
+						<!-- 圖表標題 -->
+						<TextBlock Grid.Row="0"
+						          Text="即時數據"
+						          FontSize="18"
+						          FontWeight="Bold"
+						          Foreground="White"
+						          HorizontalAlignment="Center"
+						          Margin="0,0,0,16"/>
+
+						<!-- 四個通道的小圖表網格 -->
+						<Grid Grid.Row="1" Margin="8">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="8"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="8"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+
+							<!-- 通道1圖表容器 -->
+							<Border Grid.Row="0" Grid.Column="0"
+							        Classes="Sy_Border_圖表 Sy_Border_圖表_CH1">
+								<Grid>
+									<local:Skia_通道_1 x:Name="sk_ch1"/>
+									<TextBlock Text="CH1"
+									          Classes="Sy_TB_圖表標籤"
+									          Foreground="#8BB4D8"/>
+								</Grid>
+							</Border>
+
+							<!-- 通道2圖表容器 -->
+							<Border Grid.Row="0" Grid.Column="2"
+							        Classes="Sy_Border_圖表 Sy_Border_圖表_CH2">
+								<Grid>
+									<local:Skia_通道_2 x:Name="sk_ch2"/>
+									<TextBlock Text="CH2"
+									          Classes="Sy_TB_圖表標籤"
+									          Foreground="#A8D8B0"/>
+								</Grid>
+							</Border>
+
+							<!-- 通道3圖表容器 -->
+							<Border Grid.Row="2" Grid.Column="0"
+							        Classes="Sy_Border_圖表 Sy_Border_圖表_CH3">
+								<Grid>
+									<local:Skia_通道_3 x:Name="sk_ch3"/>
+									<TextBlock Text="CH3"
+									          Classes="Sy_TB_圖表標籤"
+									          Foreground="#F4D58D"/>
+								</Grid>
+							</Border>
+
+							<!-- 通道4圖表容器 -->
+							<Border Grid.Row="2" Grid.Column="2"
+							        Classes="Sy_Border_圖表 Sy_Border_圖表_CH4">
+								<Grid>
+									<local:Skia_通道_4 x:Name="sk_ch4"/>
+									<TextBlock Text="CH4"
+									          Classes="Sy_TB_圖表標籤"
+									          Foreground="#E8B4CB"/>
+								</Grid>
+							</Border>
+						</Grid>
+
+						<!-- 底部狀態資訊 -->
+						<Grid Grid.Row="2" Margin="0,16,0,0">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+
+							<StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+								<TextBlock Text="取樣頻率: " Classes="Sy_TB_狀態資訊"/>
+								<TextBlock x:Name ="TB_取樣率" Text="1000 Hz" Classes="Sy_TB_狀態數值"/>
+							</StackPanel>
+
+							<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+								<Ellipse Width="8" Height="8" Fill="#00CC6A" Margin="0,0,8,0"/>
+								<TextBlock Text="資料更新中" Classes="Sy_TB_狀態資訊"/>
+							</StackPanel>
+
+							<StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+								<TextBlock Text="時間: " Classes="Sy_TB_狀態資訊"/>
+								<TextBlock x:Name="TB_時間戳記" Text="2025/05/24 14:30:25"
+								          FontSize="12" Foreground="White"/>
+							</StackPanel>
+						</Grid>
+					</Grid>
+				</Border>
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl>

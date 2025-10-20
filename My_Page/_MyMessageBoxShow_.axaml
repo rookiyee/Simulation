@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Clairvoyance._MyMessageBoxShow_"
+        Title="Tool control center（TCC）"
+        xmlns:local="clr-namespace:Clairvoyance"
+        TransparencyLevelHint="AcrylicBlur, Transparent"
+		Width="400" Height="250"
+        SystemDecorations="None"
+        Background="Transparent">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0" Background="Transparent">
+			<Image Source="avares://Clairvoyance/My_Photos/金屬外框.jpg"
+				   Stretch="Fill"
+				   IsHitTestVisible="False" />
+			<TextBlock Text="Tool control center（TCC）"
+					   Foreground="White"
+					   FontSize="16"
+					   VerticalAlignment="Center"
+					   HorizontalAlignment="Left"
+					   Margin="10,0,0,0" />
+			<!--右上3按鈕-->
+			<StackPanel Orientation="Horizontal"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Center"
+						Spacing="1"
+						Margin="0,0,5,0">
+
+				<!-- 縮小 -->
+				<Button Width="40" Height="28" Click="Bu_null_Minimize_Click">
+					<Button.Background>
+						<ImageBrush Source="avares://Clairvoyance/My_Photos/紅色金屬.jpg" Stretch="UniformToFill"/>
+					</Button.Background>
+					<TextBlock Text="🗕" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+				</Button>
+
+				<!-- 放大/還原 -->
+				<Button Width="40" Height="28" Click="Bu_null_MaximizeOrRestore_Click">
+					<Button.Background>
+						<ImageBrush Source="avares://Clairvoyance/My_Photos/紅色金屬.jpg" Stretch="UniformToFill"/>
+					</Button.Background>
+					<TextBlock Text="🗖" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+				</Button>
+
+				<!-- 關閉 -->
+				<Button Width="40" Height="28" Click="Bu_null_Close_Click" Cursor="Hand">
+					<Button.Background>
+						<ImageBrush Source="avares://Clairvoyance/My_Photos/紅色金屬.jpg" Stretch="UniformToFill"/>
+					</Button.Background>
+					<TextBlock Text="✕" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="16"/>
+				</Button>
+			</StackPanel>
+		</Grid>
+		<Grid Grid.Row="1">
+			<Image Source="avares://Clairvoyance/My_Photos/金屬外框.jpg"
+				   Stretch="Fill"
+				   IsHitTestVisible="False" />
+			<Grid.RowDefinitions>
+				<RowDefinition Height="30"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0">
+				<Grid.Background>
+					<ImageBrush Source="avares://Clairvoyance/My_Photos/tmsc_金屬背景.jpg"
+								Stretch="UniformToFill"/>
+				</Grid.Background>
+				<Image Source="avares://Clairvoyance/My_Photos/tmsc_銀字_白中文.png"
+				   Stretch="Fill"
+				   IsHitTestVisible="False"
+					Width="80" Height="25"
+					HorizontalAlignment="Right"
+					Margin="0,0,10,0"/>
+			</Grid>
+			<Grid Grid.Row="1">
+				<Image Source="avares://Clairvoyance/My_Photos/金屬外框.jpg"
+				   Stretch="Fill"
+				   IsHitTestVisible="False" />
+			</Grid>
+		</Grid>
+	</Grid>
+</Window>
