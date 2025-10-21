@@ -88,12 +88,13 @@ class ProjectManager:
                 
 
             # === 儲存動畫資料 ===
-            target_npy1_path = os.path.splitext(file_path)[0] + "_workpiece.npz"
-            target_npy2_path = os.path.splitext(file_path)[0] + "_tool.npz"
-            settings_dict['workpiece_for_anime'] = target_npy1_path
-            settings_dict['tool_for_anime'] = target_npy2_path
-            np.savez_compressed(target_npy1_path, data=np.array(frameClass.cnc.workpiece_for_anime, dtype=object))
-            np.savez_compressed(target_npy2_path, data=np.array(frameClass.cnc.tool_for_anime, dtype=object))
+            if frameClass.cnc.workpiece_for_anime != []:
+                target_npy1_path = os.path.splitext(file_path)[0] + "_workpiece.npz"
+                target_npy2_path = os.path.splitext(file_path)[0] + "_tool.npz"
+                settings_dict['workpiece_for_anime'] = target_npy1_path
+                settings_dict['tool_for_anime'] = target_npy2_path
+                np.savez_compressed(target_npy1_path, data=np.array(frameClass.cnc.workpiece_for_anime, dtype=object))
+                np.savez_compressed(target_npy2_path, data=np.array(frameClass.cnc.tool_for_anime, dtype=object))
 
             # === 儲存專案檔案 ===
             with open(file_path, 'w', encoding='utf-8') as f:
