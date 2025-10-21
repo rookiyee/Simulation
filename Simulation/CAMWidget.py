@@ -31,7 +31,7 @@ class SimulationWidget(QWidget):
         self.pj_manager = ProjectManager()
         self.settings = {
             'Workpiece': '',
-            'Tool': '',
+            'Tool': {},    #{'T01': ('filePath', 'toolInfo')}
             'Gcode': [],
             'Controller': '',
             'Workpiece Orientation': [0, 0, 1, ['', '', ''], ['', '', '']],
@@ -55,6 +55,7 @@ class SimulationWidget(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.next_frame)  # 每次 timeout 呼叫 next_frame
         self.play_speed = 100
+        self.gcode_is_altered = False
     
     def setup_ui(self):
         """设置界面布局和组件"""
@@ -435,12 +436,15 @@ class SimulationWidget(QWidget):
                 padding: 5px;
             }
         """)
+        self.text_edit.textChanged.connect(self.on_text_changed)
         
         vbox.addWidget(self.text_edit)
         
         # 添加到主布局 (跨2行)
         layout.addWidget(container, 1, 2, 2, 1)
     
+    def on_text_changed(self):
+        self.gcode_is_altered = True
     def get_gcode(self):
         """获取Gcode文本"""
         return self.text_edit.toPlainText()
@@ -485,7 +489,23 @@ class SimulationWidget(QWidget):
         self.ax1.set_xlim(0, x.max())
         y_min = y.min()
         y_max = y.max()
-        self.ax1.set_ylim(y_min - y_min*0.1, y_max + y_max*0.1)
+    
+        # --- FIX FOR UserWarning STARTS HERE ---
+        if y_min == y_max:
+            # If min and max are the same (flat line), set a small, fixed buffer.
+            # Check for the zero case to avoid division by zero or overly small limits
+            if y_min == 0:
+                buffer = 1  # Use a fixed range of [-1, 1] for data at zero
+                self.ax1.set_ylim(-buffer, buffer)
+            else:
+                # Use a tiny percentage of the value as the buffer for non-zero data
+                buffer = abs(y_min * 0.05) 
+                self.ax1.set_ylim(y_min - buffer, y_max + buffer)
+        else:
+            # If min and max are different, use the original 10% padding
+            self.ax1.set_ylim(y_min - y_min*0.1, y_max + y_max*0.1)
+        # --- FIX FOR UserWarning ENDS HERE ---
+    
         self.canvas1.draw()
     
     def update_2d_plot2(self, x, y, title=""):
@@ -510,7 +530,7 @@ class SimulationWidget(QWidget):
         elif self.settings['2DPlot_Column_choose'][1] == 7:
             title = "Simulated Cutting Force"
             unit = 'kN'
-        
+            
         self.ax2.set_title(title, fontsize=9)
         self.ax2.grid(True, linestyle='--', alpha=0.7)
         self.ax2.set_xlabel("time(s)", fontsize=9)
@@ -518,7 +538,24 @@ class SimulationWidget(QWidget):
         self.ax2.set_xlim(0, x.max())
         y_min = y.min()
         y_max = y.max()
-        self.ax2.set_ylim(y_min - y_min*0.1, y_max + y_max*0.1)
+    
+        # --- FIX FOR UserWarning STARTS HERE ---
+        # Check if the data is a flat line (y_min equals y_max)
+        if y_min == y_max:
+            # If the data is a flat line:
+            if y_min == 0:
+                # If the value is zero, set a fixed symmetric range around zero, e.g., [-1, 1].
+                self.ax2.set_ylim(-1, 1)
+            else:
+                # If the value is non-zero, calculate a small absolute buffer (e.g., 5% of the value)
+                # to ensure a non-singular transformation.
+                buffer = abs(y_min * 0.05) 
+                self.ax2.set_ylim(y_min - buffer, y_max + buffer)
+        else:
+            # If there is a range, use the original 10% proportional padding.
+            self.ax2.set_ylim(y_min - y_min*0.1, y_max + y_max*0.1)
+        # --- FIX FOR UserWarning ENDS HERE ---
+    
         self.canvas2.draw()
         
     def Get_Gcode_form_CNC(self):
@@ -529,7 +566,7 @@ class SimulationWidget(QWidget):
         self.settings['Gcode'] = self.Get_Gcode_form_CNC().splitlines()
         self.display_gcode()
     
-    def display_gcode(self, file_path=None, isReadFile=False, chunk_size=10000):
+    def display_gcode(self, file_path=None, isReadFile=False, chunk_size=5000):
         self.text_edit.clear()
     
         # === 模式 1: 讀檔 + 顯示 ===
@@ -544,7 +581,6 @@ class SimulationWidget(QWidget):
                 for i, line in enumerate(file):
                     self.settings['Gcode'].append(line)
                     buffer.append(line)
-
                     # 每 chunk_size 行更新一次 UI
                     if (i + 1) % chunk_size == 0:
                         self.text_edit.append(''.join(buffer))
@@ -569,7 +605,8 @@ class SimulationWidget(QWidget):
             if buffer:
                 self.text_edit.append(''.join(buffer))
                 QCoreApplication.processEvents()
-                
+        
+        self.cnc.parse_gcode(self.settings['Gcode'], self.settings['Controller'])
         self.gcode_isPrepared = True
     
     def find_nearest_index(self, points, target):
@@ -660,8 +697,10 @@ class SimulationWidget(QWidget):
         df.to_csv(export_filepath, index=False)
         QMessageBox.information(self, "匯出成功", f"已成功匯出至:\n{export_filepath}")
         
-    def plot_tool_mesh(self):
-        filepath = self.settings['Tool']
+    def plot_tool_mesh(self, filepath):
+        # filepath = self.settings['Tool']
+        if filepath == '':
+            return
         self.cnc.alignment_tool_and_offset(filepath, self.settings['Workpiece Offset'])
         t_vertices = self.cnc.tool.vertices
         t_faces = self.cnc.tool.faces
@@ -671,7 +710,7 @@ class SimulationWidget(QWidget):
         self.actor_tool = self.plotter_3d.add_mesh(mesh_pv, color='lightblue', show_edges=False)
         
     def import_tool(self):
-        filepath = self.settings['Tool']
+        filepath = list(self.settings['Tool'].values())[0][0]
         is_verified = True
         if filepath == '':
             QMessageBox.warning(self, '提示', 'Tool has not imported!')
@@ -681,11 +720,11 @@ class SimulationWidget(QWidget):
             is_verified = False
         if not is_verified:
             return
-        self.plot_tool_mesh()
+        self.plot_tool_mesh(filepath)
         self.tool_isPrepared = True
      
     def set_workpiece_offset(self):
-        filepath = self.settings['Tool']
+        filepath = list(self.settings['Tool'].values())[0][0]
         is_verified = True
         if filepath == '':
             QMessageBox.warning(self, '提示', 'Tool has not imported!')
@@ -802,8 +841,14 @@ class SimulationWidget(QWidget):
 
     def Calculate_thread(self):
         text = self.text_edit.toPlainText()
-        self.settings['Gcode'] = text
-        self.cnc.calculate_cutting_volume(self.settings['Simulation Mode'], self.progress_bar, self.settings['Workpiece'], self.settings['Tool'], self.settings['Workpiece Orientation'], self.settings['Workpiece Offset'], text.strip().split('\n'), self.settings['Controller'])
+        if self.gcode_is_altered:
+            self.settings['Gcode'] = text
+        self.cnc.calculate_cutting_volume(self.settings['Simulation Mode'], self.progress_bar, self.settings['Workpiece'], 
+                                          self.settings['Tool'], self.settings['Workpiece Orientation'], 
+                                          self.settings['Workpiece Offset'], text.strip().split('\n'), 
+                                          self.settings['Controller'], self.settings['Tool'], self.gcode_is_altered)
+        self.gcode_is_altered = False
+        
     def CalculateButton_Onclick(self):
         if self.check_filePath():
             self.set_Workpiece_Orientation()
@@ -829,6 +874,8 @@ class SimulationWidget(QWidget):
             time.sleep(0.5)
             
         if isinstance(self.cnc.cutting_parameters, list):
+            if self.cnc.cutting_parameters == []:
+                return
             cutting_parameters = np.concatenate(self.cnc.cutting_parameters, axis=0)
         else:
             cutting_parameters = self.cnc.cutting_parameters

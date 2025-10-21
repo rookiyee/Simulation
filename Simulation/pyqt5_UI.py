@@ -3,15 +3,18 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QTabWidget, 
                              QFrame, QSplitter, QScrollArea, QTreeWidget, 
                              QTreeWidgetItem, QMessageBox, QFileDialog,
-                             QDialog, QLineEdit, QComboBox, QGridLayout, QFormLayout, QDialogButtonBox)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPalette, QColor, QCloseEvent
+                             QDialog, QLineEdit, QComboBox, QGridLayout, QFormLayout, QDialogButtonBox, QTableWidget, 
+                             QHeaderView, QSizePolicy, QTableWidgetItem, QTextEdit, QProgressBar)
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QCoreApplication
+from PyQt5.QtGui import QPalette, QColor, QCloseEvent, QTextCursor
 import os
 from CAMWidget import SimulationWidget
 from projectManager import ProjectManager
 import pandas as pd
 import numpy as np
 import trimesh
+import time
+import re
 
 class CAMSimulator(QMainWindow):
     def __init__(self):
@@ -391,7 +394,7 @@ class CAMSimulator(QMainWindow):
             scroll_area = tab_components['scroll_area']
             scroll_area.show()
             tab_components['sidebar_visible'] = True
-    
+            
     def window_input_filePath(self, frameClass, key):
         class InputFileDialog(QDialog):
             def __init__(self, parent=None):
@@ -501,66 +504,268 @@ class CAMSimulator(QMainWindow):
     
                 frameClass.settings['Workpiece Offset'] = values
                 if frameClass.set_workpiece_offset():
-                    frameClass.plot_tool_mesh()
+                    filepath = list(frameClass.settings['Tool'].values())[0][0]
+                    frameClass.plot_tool_mesh(filepath)
                 self.accept()
     
         dialog = OffsetDialog(self)
         dialog.exec_()
+
+    def open_window_for_select_tool(self, frameClass):
+        class ToolDialog(QDialog):
+            def __init__(self, parent=None):
+                super().__init__(parent)
+                self.setWindowTitle("刀具設定")
+                self.resize(900, 400)
+
+                # 建立 Table，改為 6 欄
+                self.table = QTableWidget(0, 6, self)
+                self.table.setHorizontalHeaderLabels(["刀號", "刀具資訊", "刀具檔案路徑", "選擇檔案", "查看", "刪除"])
+                self.table.verticalHeader().setVisible(False)
+
+                header = self.table.horizontalHeader()
+                # 前三欄等寬
+                header.setSectionResizeMode(0, QHeaderView.Stretch)
+                header.setSectionResizeMode(1, QHeaderView.Stretch)
+                header.setSectionResizeMode(2, QHeaderView.Stretch)
+                # 後三欄固定寬度
+                header.setSectionResizeMode(3, QHeaderView.Fixed)
+                header.setSectionResizeMode(4, QHeaderView.Fixed)
+                header.setSectionResizeMode(5, QHeaderView.Fixed)
+                self.table.setColumnWidth(3, 100)
+                self.table.setColumnWidth(4, 100)
+                self.table.setColumnWidth(5, 100)
+
+                # 下方按鈕
+                self.add_btn = QPushButton("Add Tool")
+                self.apply_btn = QPushButton("Apply")
+
+                self.add_btn.clicked.connect(self.add_row)
+                self.apply_btn.clicked.connect(self.apply_changes)
+
+                # 版面配置
+                layout = QVBoxLayout()
+                layout.addWidget(self.table)
+
+                btn_layout = QHBoxLayout()
+                btn_layout.addWidget(self.add_btn)
+                btn_layout.addStretch()
+                btn_layout.addWidget(self.apply_btn)
+                layout.addLayout(btn_layout)
+
+                self.setLayout(layout)
+                tool_setting = frameClass.settings['Tool']
+                tool_setting_list_for_key = list(tool_setting)
+                tool_setting_list_for_value = list(tool_setting.values())
+                for key, value in zip(tool_setting_list_for_key, tool_setting_list_for_value):
+                    self.add_row(key, str(value[1]), str(value[0]))
+
+
+            def add_row(self, tool_id='', tool_info='', tool_filePath=''):
+                row = self.table.rowCount()
+                self.table.insertRow(row)
+                
+                # 刀號
+                self.table.setItem(row, 0, QTableWidgetItem(tool_id))
+
+                # 刀具資訊
+                self.table.setItem(row, 1, QTableWidgetItem(tool_info))
+
+                # 刀具檔案路徑
+                path_item = QTableWidgetItem(tool_filePath)
+                self.table.setItem(row, 2, path_item)
+
+                # 「選擇」按鈕
+                select_btn = QPushButton("選擇")
+                select_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                select_btn.clicked.connect(lambda _, r=row: self.select_file(r))
+                self.table.setCellWidget(row, 3, select_btn)
+
+                # 「查看」按鈕
+                view_btn = QPushButton("刀具模型")
+                view_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                view_btn.clicked.connect(lambda _, r=row: self.view_tool(r))
+                self.table.setCellWidget(row, 4, view_btn)
+
+                # 「刪除」按鈕
+                delete_btn = QPushButton("刪除")
+                delete_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                delete_btn.clicked.connect(lambda _, r=row: self.delete_row(r))
+                self.table.setCellWidget(row, 5, delete_btn)
+
+            def select_file(self, row):
+                file_path, _ = QFileDialog.getOpenFileName(self, "選擇刀具檔案", "", "All Files (*.*)")
+                if file_path:
+                    self.table.item(row, 2).setText(file_path)
+
+            def view_tool(self, row):
+                filepath = self.table.item(row, 2).text()
+                frameClass.plot_tool_mesh(filepath)
+
+            def delete_row(self, row):
+                """刪除該行"""
+                reply = QMessageBox.question(
+                    self,
+                    "確認刪除",
+                    f"確定要刪除第 {row + 1} 列的刀具嗎？",
+                    QMessageBox.Yes | QMessageBox.No
+                )
+                if reply == QMessageBox.Yes:
+                    self.table.removeRow(row)
             
-    def open_window_for_gcode(self, frameClass):
+            def to_T_number_format(self, inputs):
+                tool_match = re.search(r'\bT(\d+)\b', inputs)
+                if tool_match:
+                    tool_num = int(tool_match.group(1))
+                    tool_id = f"T{tool_num}"
+                    return tool_id
+                else:
+                    print(f'hihi{inputs}')
+                    return inputs
+            def apply_changes(self):
+                frameClass.settings['Tool'] = {}
+                for row in range(self.table.rowCount()):
+                    if self.table.rowCount() > 1 and self.table.item(row, 0).text() == '':
+                        QMessageBox.warning(self, "Warning", "複數刀具時不能有刀號為空字串")
+                        return
+                    frameClass.settings['Tool'][self.to_T_number_format(self.table.item(row, 0).text())] = (self.table.item(row, 2).text(), self.table.item(row, 1).text())
+                frameClass.import_tool()
+                self.accept()
+                
+        dialog = ToolDialog(self)
+        dialog.exec_()
+
+    def open_window_for_gcode(self, frameClass): 
+        class DisplayGcodeThread(QThread):
+            # 傳回已 join 的字串，減少大量物件序列化開銷
+            chunk_signal = pyqtSignal(str)
+            finished_signal = pyqtSignal(list)
+            progress_signal = pyqtSignal(float)  # 新增进度信号
+            
+            def __init__(self, file_path, controller, progress_bar, progress_label, chunk_size=5000, parent=None):
+                super().__init__(parent)
+                self.file_path = file_path
+                self.controller = controller
+                self.chunk_size = chunk_size
+                self.progress_bar = progress_bar  # 保存进度条引用
+                self.progress_label = progress_label
+                self._stopped = False
+        
+            def run(self):
+                buffer = []
+                gcode_lines = []
+    
+                try:
+                    # 重新读取文件并处理
+                    with open(self.file_path, 'r', encoding='utf-8') as file:
+                        for i, line in enumerate(file):
+                            if self._stopped:
+                                return
+                            gcode_lines.append(line)
+                            buffer.append(line)
+                            if (i + 1) % self.chunk_size == 0:
+                                # emit 已 join 的字串
+                                self.chunk_signal.emit(''.join(buffer))
+                                buffer.clear()
+    
+                        if buffer:
+                            self.chunk_signal.emit(''.join(buffer))
+    
+                    # 解析 G-code（耗時，但已在執行緒）
+                    # 显示进度条
+                    self.progress_label.show()
+                    self.progress_bar.show()
+                    self.progress_bar.setValue(0)
+                    self.progress_label.setText("解析G-code...")
+                    frameClass.cnc.parse_gcode(gcode_lines, self.controller, self.progress_signal)
+                    frameClass.settings['Gcode'] = gcode_lines
+    
+                   
+                    
+                    # 回傳工具清單
+                    tool_info = frameClass.cnc.tool_list
+                    if tool_info != []:
+                        # frameClass.settings['Tool'] = {}
+                        for tuple_info in tool_info:
+                            if tuple_info[0] in frameClass.settings['Tool']:
+                                frameClass.settings['Tool'][tuple_info[0]][1] = tuple_info[1]
+                            else:
+                                frameClass.settings['Tool'][tuple_info[0]] = ('', tuple_info[1])
+                    self.finished_signal.emit(tool_info)
+                except Exception as e:
+                    print(f"Error in DisplayGcodeThread: {e}")
+                    # 若有錯誤，也用 finished_signal 回傳空 list 或依需求回傳錯誤訊息
+                    self.finished_signal.emit([])
+    
+            def stop(self):
+                self._stopped = True
+    
         class GcodeDialog(QDialog):
             def __init__(self, parent=None):
                 super().__init__(parent)
                 self.setWindowTitle("Gcode")
-                self.setFixedSize(350, 220)
+                self.setFixedSize(400, 300)
+                # 不移除關閉按鈕，改用 closeEvent 控制是否允許關閉
+                self.loader_thread = None
+                self.processing = False  # 正在處理的旗標
     
                 self.main_layout = QVBoxLayout()
                 self.setLayout(self.main_layout)
     
-                # 標籤 + 下拉選單
-                label = QLabel("Please select data source：")
+                # 下拉選單
                 self.combo = QComboBox()
                 self.combo.addItems(["Import files from your computer", "Connect to the CNC to obtain data"])
                 self.combo.currentIndexChanged.connect(self.on_combo_change)
-                self.combo.setStyleSheet("""
-                    QComboBox {
-                        padding: 5px;
-                        font-size: 14px;
-                    }
-                    QComboBox QAbstractItemView {
-                        selection-background-color: white;
-                        selection-color: black;
-                    }
-                """)
-    
-                self.main_layout.addWidget(label)
+                self.main_layout.addWidget(QLabel("Please select data source："))
                 self.main_layout.addWidget(self.combo)
-                
-                label2 = QLabel("Please select Controller：")
+    
                 self.combo2 = QComboBox()
                 self.combo2.addItems(["Siemens", "Fanuc"])
-                self.combo2.currentIndexChanged.connect(self.on_combo_change)
-                self.combo2.setStyleSheet("""
-                    QComboBox {
-                        padding: 5px;
-                        font-size: 14px;
-                    }
-                    QComboBox QAbstractItemView {
-                        selection-background-color: white;
-                        selection-color: black;
-                    }
-                """)
-    
-                self.main_layout.addWidget(label2)
+                current_value = frameClass.settings.get('Controller', '')
+                if current_value != '':
+                    index = self.combo2.findText(str(current_value))
+                    if index >= 0:
+                        self.combo2.setCurrentIndex(index)
+                self.main_layout.addWidget(QLabel("Please select Controller："))
                 self.main_layout.addWidget(self.combo2)
     
-                # 動態元件區域
+                # 動態區域
                 self.dynamic_frame = QWidget()
                 self.dynamic_layout = QVBoxLayout()
                 self.dynamic_frame.setLayout(self.dynamic_layout)
                 self.main_layout.addWidget(self.dynamic_frame)
+    
+                # 进度条区域
+                self.progress_layout = QVBoxLayout()
+                self.main_layout.addLayout(self.progress_layout)
                 
-                # ✅ 預設顯示第一個選項對應畫面
+                # 进度条标签
+                self.progress_label = QLabel("Reading G-code")
+                self.progress_label.setAlignment(Qt.AlignCenter)
+                self.progress_label.hide()  # 初始隐藏
+                self.progress_layout.addWidget(self.progress_label)
+                
+                # 进度条
+                self.progress_bar = QProgressBar()
+                self.progress_bar.setRange(0, 1000)
+                self.progress_bar.setValue(0)
+                self.progress_bar.setStyleSheet("""
+                    QProgressBar {
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        text-align: center;
+                        background-color: #f0f0f0;
+                        height: 20px;
+                    }
+                    QProgressBar::chunk {
+                        background-color: #4CAF50;
+                        width: 10px;
+                    }
+                """)
+                self.progress_bar.hide()  # 初始隐藏
+                self.progress_layout.addWidget(self.progress_bar)
+    
+                # 預設顯示第一個選項
                 self.combo.setCurrentIndex(0)
                 self.on_combo_change(0)
     
@@ -577,7 +782,6 @@ class CAMSimulator(QMainWindow):
     
                 if selected == "Import files from your computer":
                     self.file_path_edit = QLineEdit()
-                    self.file_path_edit.setPlaceholderText("")
                     self.file_path_edit.setAlignment(Qt.AlignCenter)
     
                     browse_btn = QPushButton("Select File")
@@ -591,7 +795,7 @@ class CAMSimulator(QMainWindow):
                     self.dynamic_layout.addWidget(apply_btn)
     
                 elif selected == "Connect to the CNC to obtain data":
-                    connect_btn = QPushButton("Conect")
+                    connect_btn = QPushButton("Connect")
                     connect_btn.clicked.connect(self.connect_machine)
     
                     apply_btn = QPushButton("Apply")
@@ -601,18 +805,78 @@ class CAMSimulator(QMainWindow):
                     self.dynamic_layout.addWidget(apply_btn)
     
             def browse_file(self):
-                path, _ = QFileDialog.getOpenFileName(self, "Select G-code file", "", "G-code files (*.nc *.mpf *.txt);;所有檔案 (*)")
+                path, _ = QFileDialog.getOpenFileName(self, "Select G-code file", "", "G-code files (*.nc *.mpf *.txt);;All files (*)")
                 if path:
                     self.file_path_edit.setText(path)
     
             def apply_file(self):
                 path = self.file_path_edit.text()
-                if path:
-                    frameClass.display_gcode(path, True)
-                    frameClass.settings['Controller'] = self.combo2.currentText()
-                    self.accept()
-                else:
+                if not path:
                     QMessageBox.warning(self, "Warning", "Please select the file first！")
+                    return
+    
+                frameClass.settings['Controller'] = self.combo2.currentText()
+    
+                # 標記為正在處理
+                self.processing = True
+                
+    
+                # 啟動執行緒（parent 設為 self，確保生命周期）
+                self.loader_thread = DisplayGcodeThread(
+                    path, 
+                    self.combo2.currentText(), 
+                    self.progress_bar,  # 传递进度条
+                    self.progress_label,
+                    parent=self
+                )
+                self.loader_thread.chunk_signal.connect(self.update_text_edit)
+                self.loader_thread.finished_signal.connect(self.on_finished)
+                self.loader_thread.progress_signal.connect(self.update_progress)  # 连接进度信号
+                self.loader_thread.start()
+                
+                frameClass.gcode_isPrepared = True
+                # 禁用動態區的按鈕，避免重複啟動
+                for i in range(self.dynamic_layout.count()):
+                    widget = self.dynamic_layout.itemAt(i).widget()
+                    if isinstance(widget, QPushButton):
+                        widget.setEnabled(False)
+    
+            def update_text_edit(self, chunk_str: str):
+                # 如果需要，这里可以保留对文本的处理
+                # 但主要功能已转移到进度条
+                frameClass.text_edit.moveCursor(QTextCursor.End)
+                frameClass.text_edit.insertPlainText(chunk_str)
+                frameClass.text_edit.moveCursor(QTextCursor.End)
+    
+            def update_progress(self, value):
+                """更新进度条"""
+                self.progress_bar.setValue(min(int(round(value)), 1000))
+                self.progress_bar.setFormat(f"{value / 10:.1f} %")  # 顯示小數點一位
+                QCoreApplication.processEvents()
+    
+            def on_finished(self, tool_info):
+                # 完成後把 processing 清掉
+                self.processing = False
+                
+                # 隐藏进度条
+                # self.progress_label.hide()
+                # self.progress_bar.hide()
+    
+                if not tool_info:
+                    QMessageBox.warning(self, "Message", "G-code換刀指令資訊:\nNone")
+                else:
+                    message = '\n'.join(f"{t[0]}, {t[1]}" for t in tool_info)
+                    QMessageBox.information(self, "Message", f'G-code換刀指令資訊:\n{message}')
+    
+                # 啟用動態區按鈕
+                for i in range(self.dynamic_layout.count()):
+                    widget = self.dynamic_layout.itemAt(i).widget()
+                    if isinstance(widget, QPushButton):
+                        widget.setEnabled(True)
+    
+                # 安全關閉對話框（如果使用者沒有手動關閉）
+                if self.isVisible():
+                    self.accept()
     
             def connect_machine(self):
                 QMessageBox.information(self, "Message", "Connection successful")
@@ -621,9 +885,17 @@ class CAMSimulator(QMainWindow):
                 frameClass.connect_cnc()
                 self.accept()
     
-        # 建立並執行 dialog
+            def closeEvent(self, event):
+                # 如果正在處理，阻止關閉並提示
+                if self.processing:
+                    event.ignore()
+                    return
+                event.accept()
+    
+        # 執行 dialog（模態）
         dialog = GcodeDialog(self)
         dialog.exec_()
+
 
     def open_window_for_workpiece_rotation(self, frameClass):
         class RotationDialog(QDialog):
@@ -1029,12 +1301,15 @@ class CAMSimulator(QMainWindow):
         tab_components = current_tab.tab_components
         main_frame = tab_components['main_content_frame']
 
-        if item_text in ['Workpiece', 'Tool']:
+        if item_text == 'Workpiece':
             self.window_input_filePath(main_frame, item_text)
+        if item_text == 'Tool':
+            self.open_window_for_select_tool(main_frame)
         elif item_text == 'Quick Create 3D model':
             self.open_window_for_create_3dModel()
         elif item_text == 'Gcode':
             self.open_window_for_gcode(main_frame)
+            main_frame.gcode_is_altered = False
         elif item_text == 'STH Signal':
             self.window_input_filePath(main_frame, item_text)
         elif item_text == 'Workpiece Offset':
@@ -1072,11 +1347,14 @@ class CAMSimulator(QMainWindow):
         frameClass.import_workpiece()
         frameClass.import_tool()
         frameClass.import_STH_data()
-        frameClass.display_gcode()
+        # frameClass.display_gcode()
         if frameClass.set_workpiece_offset():
-            frameClass.plot_tool_mesh()
+            filepath = list(frameClass.settings['Tool'].values())[0][0]
+            frameClass.plot_tool_mesh(filepath)
         if frameClass.set_Workpiece_Orientation():
             frameClass.plot_workpiece_mesh()
+        
+        self.open_window_for_gcode(frameClass)
             
         if frameClass.settings['workpiece_for_anime'] != '' and frameClass.settings['tool_for_anime'] != '':
             frameClass.cnc.workpiece_for_anime = np.load(frameClass.settings['workpiece_for_anime'], allow_pickle=True)['data']
